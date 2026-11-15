@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "배찬혁 | 프로필",
-  description: "경찰행정학과에 재학 중이고 운동을 좋아하는 대학생 배찬혁입니다.",
+  description: "새로운 기술을 탐구하고 문제를 해결하며, 사용자에게 가치를 전달하는 개발자 배찬혁입니다.",
 };
 
 export default function RootLayout({
