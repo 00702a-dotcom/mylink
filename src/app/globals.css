@@ -1,3 +1,6 @@
+/* Pretendard via CDN (반드시 가장 맨 위에 있어야 합니다) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 @import "tailwindcss";
 
 /* =========================================
@@ -25,7 +28,7 @@
   --white:    #FFFFFF;
 
   /* Semantic */
-  --red-500:   #F04452;
+  --red-500:    #F04452;
   --green-500: #12805C;
   --yellow-500: #FFC342;
 
@@ -68,9 +71,6 @@ html, body {
   background-color: var(--blue-50);
   color: var(--blue-500);
 }
-
-/* Pretendard via CDN */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 /* TDS Utilities */
 .tds-tabular { font-variant-numeric: tabular-nums; }
