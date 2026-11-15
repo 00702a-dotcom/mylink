@@ -3,335 +3,644 @@
 import { useState } from "react";
 import Image from "next/image";
 
-export default function ProfilePage() {
+interface ProjectItem {
+  id: string;
+  name: string;
+  category: string;
+  badge?: string;
+  tagline: string;
+  swatches: string[];
+  techs: string;
+  link: string;
+  isSale?: boolean;
+  statusText: string;
+  originalStatus?: string;
+  discountText?: string;
+}
+
+export default function NikeProfilePage() {
+  const [activeFilter, setActiveFilter] = useState("all");
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [activeDisclosure, setActiveDisclosure] = useState<number | null>(0);
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      setToastMessage("🎉 프로필 링크 복사 완료!");
+      setToastMessage("Link copied to clipboard");
       setTimeout(() => {
         setCopied(false);
         setToastMessage("");
-      }, 2500);
+      }, 2400);
     } catch {
-      alert("링크 복사에 실패했습니다.");
+      alert("Failed to copy link.");
     }
   };
 
-  const techStacks = [
-    { name: "Next.js", bg: "bg-black text-white dark:bg-white dark:text-black" },
-    { name: "React", bg: "bg-[#61DAFB] text-black" },
-    { name: "TypeScript", bg: "bg-[#3178C6] text-white" },
-    { name: "Tailwind CSS", bg: "bg-[#38BDF8] text-black" },
-    { name: "Firebase", bg: "bg-[#FFCA28] text-black" },
-    { name: "Git / GitHub", bg: "bg-[#F05032] text-white" },
-    { name: "Vibe Coding", bg: "bg-[#E879F9] text-black font-black" },
-    { name: "Full-Stack", bg: "bg-[#4ADE80] text-black" },
+  const toggleDisclosure = (index: number) => {
+    setActiveDisclosure(activeDisclosure === index ? null : index);
+  };
+
+  const projects: ProjectItem[] = [
+    {
+      id: "mylink",
+      name: "MyLink Bio Commerce",
+      category: "Full-Stack Web Application",
+      badge: "Just In",
+      tagline: "Ultra-responsive link portal built on Nike's design grammar.",
+      swatches: ["#111111", "#3178C6", "#007D48"],
+      techs: "Next.js · TypeScript · Tailwind CSS",
+      link: "https://github.com",
+      statusText: "Production Ready",
+      isSale: false,
+    },
+    {
+      id: "vibe-ai",
+      name: "Vibe Engine AI",
+      category: "Autonomous Prototyping Tool",
+      badge: "Member Exclusive",
+      tagline: "Natural-language workflow accelerator for zero-latency prototyping.",
+      swatches: ["#111111", "#D30005", "#38BDF8"],
+      techs: "Python · React · Gemini API",
+      link: "https://github.com",
+      statusText: "v2.0 Beta",
+      originalStatus: "v1.0",
+      discountText: "Major Upgrade",
+      isSale: true,
+    },
+    {
+      id: "police-civic",
+      name: "Civic Security Platform",
+      category: "Public Safety & Administrative Analytics",
+      badge: "Featured",
+      tagline: "Data-driven administrative analytics dashboard and resource dispatcher.",
+      swatches: ["#111111", "#707072", "#1151FF"],
+      techs: "Firebase · TypeScript · Next.js",
+      link: "https://github.com",
+      statusText: "Open Source",
+      isSale: false,
+    },
   ];
 
-  const highlights = [
-    {
-      badge: "SPEED",
-      title: "빠른 실행력",
-      desc: "아이디어를 즉각 코드로 구현하는 신속한 프로토타이핑",
-      color: "bg-[#FEF08A] dark:bg-[#713f12]/40", // Yellow
-      icon: "⚡",
-    },
-    {
-      badge: "MODERN",
-      title: "모던 웹 개발",
-      desc: "Next.js · React 기반의 유려하고 인터랙티브한 사용자 경험",
-      color: "bg-[#BAE6FD] dark:bg-[#0c4a6e]/40", // Blue
-      icon: "💻",
-    },
-    {
-      badge: "GROWTH",
-      title: "끝없는 탐구",
-      desc: "최신 AI 도구와 새로운 기술을 끊임없이 학습하고 적용",
-      color: "bg-[#BBF7D0] dark:bg-[#14532d]/40", // Green
-      icon: "🚀",
-    },
-  ];
+  const filteredProjects = projects.filter((p) => {
+    if (activeFilter === "all") return true;
+    if (activeFilter === "web") return p.category.includes("Web");
+    if (activeFilter === "ai") return p.category.includes("AI");
+    if (activeFilter === "admin") return p.category.includes("Safety") || p.category.includes("Public");
+    return true;
+  });
 
-  const socialLinks = [
+  const disclosures = [
     {
-      name: "GitHub",
-      href: "https://github.com",
-      desc: "오픈소스 및 프로젝트 저장소 둘러보기",
-      tag: "REPO",
-      tagColor: "bg-[#E0E7FF] text-indigo-800",
-      icon: (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-        </svg>
-      ),
+      title: "Technical Competencies & Core Stack",
+      content:
+        "Front-End Engineering with Next.js 16 (Turbopack, App Router, RSC) and React 19. Strict TypeScript typing, zero-redundancy Tailwind CSS architecture, responsive touch systems compliant with WCAG AAA standards. Backend integration with Firebase Firestore, Edge APIs, and modular component design systems.",
     },
     {
-      name: "Tech Blog",
-      href: "https://velog.io",
-      desc: "배운 점과 트러블슈팅 과정을 기록하는 블로그",
-      tag: "POSTS",
-      tagColor: "bg-[#FEF08A] text-amber-900",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
-      ),
+      title: "Engineering Philosophy & Vibe Coding",
+      content:
+        "Rooted in the principle that 'Photography speaks, the chrome doesn't.' We prioritize mechanical restraint in the user interface—neutral typography, mathematical 8px vertical spacing, and pill geometry—allowing functionality and content to command full focus. Zero decorative gradients, zero arbitrary shadows, 100% intentional execution.",
     },
     {
-      name: "Portfolio & Works",
-      href: "#projects",
-      desc: "제작한 웹 애플리케이션 및 사이드 프로젝트",
-      tag: "WORKS",
-      tagColor: "bg-[#FBCFE8] text-pink-900",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-      ),
+      title: "Collaboration & Work Inquiries",
+      content:
+        "Open for select software engineering roles, technical advisory, and high-velocity prototyping contracts. Direct communication via email (contact@example.com) or GitHub repositories.",
     },
   ];
 
   return (
-    <main className="neo-dots min-h-screen w-full flex items-center justify-center p-4 sm:p-8 md:p-12 text-slate-900 dark:text-zinc-100 selection:bg-yellow-300 selection:text-black">
+    <div className="min-h-screen w-full bg-[#ffffff] text-[#111111] antialiased flex flex-col font-sans selection:bg-[#111111] selection:text-[#ffffff]">
       
-      {/* 바깥쪽 장식용 스티커 (데스크톱 전용) */}
-      <div className="hidden lg:block fixed top-10 left-10 rotate-[-8deg] pointer-events-none z-10">
-        <div className="bg-[#FFE600] text-black font-black text-xs px-3.5 py-1.5 border-3 border-black shadow-[4px_4px_0px_0px_#000] rounded-lg tracking-wider">
-          ★ 100% VIBE CODED
+      {/* 1. UTILITY BAR ({component.utility-bar}) */}
+      <div className="w-full bg-[#f5f5f5] text-[#111111] h-9 px-4 sm:px-8 md:px-12 flex items-center justify-between text-xs font-medium border-none select-none">
+        <div className="flex items-center gap-4 text-[#707072]">
+          <span className="font-semibold text-[#111111] tracking-wider uppercase text-[11px]">
+            BCH // ATELIER
+          </span>
+          <span className="hidden sm:inline">·</span>
+          <span className="hidden sm:inline text-[#707072]">
+            Engineering & Athletic Minimal UI
+          </span>
+        </div>
+        <div className="flex items-center gap-4 sm:gap-6 text-xs text-[#111111]">
+          <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#707072] transition">
+            GitHub
+          </a>
+          <span>·</span>
+          <a href="https://velog.io" target="_blank" rel="noreferrer" className="hover:text-[#707072] transition">
+            Tech Blog
+          </a>
+          <span>·</span>
+          <a href="mailto:contact@example.com" className="hover:text-[#707072] transition">
+            Contact
+          </a>
+          <span>·</span>
+          <span className="text-[#707072]">KR</span>
         </div>
       </div>
-      <div className="hidden lg:block fixed bottom-10 right-10 rotate-[6deg] pointer-events-none z-10">
-        <div className="bg-[#67E8F9] text-black font-black text-xs px-3.5 py-1.5 border-3 border-black shadow-[4px_4px_0px_0px_#000] rounded-lg tracking-wider">
-          ⚡ BUILD IN PUBLIC
-        </div>
-      </div>
 
-      {/* 메인 네오브루탈리즘 카드 */}
-      <div className="w-full max-w-xl bg-white dark:bg-[#18181b] border-4 border-black dark:border-white shadow-[8px_8px_0px_0px_#000] dark:shadow-[8px_8px_0px_0px_#fff] rounded-3xl overflow-hidden transition-all">
-        
-        {/* 상단 배너 영역 */}
-        <div className="relative w-full h-40 sm:h-52 border-b-4 border-black dark:border-white overflow-hidden bg-[#FFE600]">
-          <Image
-            src="/dev-banner.jpg"
-            alt="Developer Banner"
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/15 pointer-events-none" />
-
-          {/* 네오브루탈 스티커 배지 (우측 상단) */}
-          <div className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 flex flex-col items-end gap-1.5">
-            <div className="inline-flex items-center gap-1.5 bg-[#4ADE80] text-black font-black text-[11px] sm:text-xs px-3 py-1 border-2 border-black shadow-[3px_3px_0px_0px_#000] rounded-lg">
-              <span className="w-2.5 h-2.5 rounded-full bg-black animate-pulse" />
-              AVAILABLE FOR WORK
-            </div>
-            <div className="hidden sm:inline-block bg-[#F472B6] text-black font-black text-[10px] px-2.5 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-md">
-              📍 SEOUL, KR
-            </div>
-          </div>
-        </div>
-
-        {/* 본문 콘텐츠 패딩 영역 */}
-        <div className="p-5 sm:p-8 pt-0">
+      {/* 2. PRIMARY NAVIGATION ({component.primary-nav}) */}
+      <header className="sticky top-0 z-40 w-full bg-[#ffffff] shadow-hairline-inset">
+        <div className="max-w-[1440px] mx-auto h-14 sm:h-16 px-4 sm:px-8 md:px-12 flex items-center justify-between">
           
-          {/* 아바타 & 퀵 태그 영역 (배너 위로 겹침) */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 sm:-mt-20 mb-5 gap-3">
-            {/* 아바타 박스 */}
-            <div className="relative">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-4 border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] bg-[#FEF08A] relative group">
-                <Image
-                  src="/profile-avatar.jpg"
-                  alt="배찬혁 프로필 아바타"
-                  fill
-                  priority
-                  className="object-cover transition-transform duration-200 group-hover:scale-105"
-                />
-              </div>
-              {/* 온라인 상태 핀 */}
-              <div className="absolute -bottom-2 -right-2 bg-[#22C55E] text-black font-black text-[10px] px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-md flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                ONLINE
-              </div>
+          {/* Logo / Brand Mark */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#111111] text-[#ffffff] flex items-center justify-center font-bold text-xs tracking-tighter">
+              BCH
             </div>
-
-            {/* 역할 스티커 */}
-            <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
-              <span className="bg-[#E879F9] text-black font-extrabold text-xs px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-lg">
-                ⚡ 바이브 코더
-              </span>
-              <span className="bg-[#67E8F9] text-black font-extrabold text-xs px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-lg">
-                🚀 주니어 개발자
-              </span>
-            </div>
+            <span className="font-bold tracking-tight text-sm sm:text-base hidden sm:inline uppercase">
+              Bae Chan-hyeok
+            </span>
           </div>
 
-          {/* 이름 & 소개 헤더 */}
-          <div className="text-center sm:text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 justify-center sm:justify-start">
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-black dark:text-white">
-                배찬혁
-              </h1>
-              <span className="inline-block bg-[#FDE047] text-black font-mono font-bold text-xs px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-md self-center sm:self-auto">
-                @chanhyeok.dev
-              </span>
-            </div>
-            <p className="mt-2 text-sm sm:text-base font-bold text-slate-800 dark:text-zinc-200">
-              💡 코드와 아이디어로 가치를 만드는 소프트웨어 개발자
-            </p>
-          </div>
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+            <a href="#overview" className="text-[#111111] border-b-2 border-[#111111] pb-1 font-semibold">
+              Overview
+            </a>
+            <a href="#works" className="text-[#707072] hover:text-[#111111] transition">
+              Works & Catalog
+            </a>
+            <a href="#stack" className="text-[#707072] hover:text-[#111111] transition">
+              Specifications
+            </a>
+            <a href="#philosophy" className="text-[#707072] hover:text-[#111111] transition">
+              Philosophy
+            </a>
+            <a href="mailto:contact@example.com" className="text-[#707072] hover:text-[#111111] transition">
+              Connect
+            </a>
+          </nav>
 
-          {/* 개발자 소개글 박스 (네오브루탈 시그니처) */}
-          <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#FFFBEB] dark:bg-[#27272a] border-3 border-black dark:border-white shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] relative">
-            <div className="absolute -top-3 left-4 bg-black text-white dark:bg-white dark:text-black font-black text-[10px] px-2.5 py-0.5 uppercase tracking-wider rounded border border-black">
-              DEV BIO // 소개
+          {/* Right Action Cluster */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Search Pill */}
+            <div className="hidden lg:flex items-center h-10 px-4 bg-[#f5f5f5] rounded-full text-xs text-[#707072] w-56">
+              <svg className="w-4 h-4 text-[#111111] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>Search portfolio...</span>
             </div>
-            <p className="mt-1 text-slate-900 dark:text-zinc-100 text-sm sm:text-[15px] leading-relaxed font-semibold">
-              &ldquo;새로운 기술을 탐구하고 문제를 해결하며, 사용자에게 가치를 전달하는 개발자 배찬혁입니다.
-              기초적인 웹 표준부터 최신 프레임워크와 AI 바이브 코딩까지, 끝없는 호기심으로 매일 더 나은 프로덕트를 실천합니다.&rdquo;
-            </p>
-          </div>
 
-          {/* 핵심 역량 3분할 네오 카드 */}
-          <div className="mt-7">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 bg-black dark:bg-white inline-block" />
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                KEY HIGHLIGHTS // 핵심 강점
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {highlights.map((item) => (
-                <div
-                  key={item.title}
-                  className={`p-3.5 rounded-xl border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] ${item.color} text-black dark:text-zinc-100 transition-transform hover:-translate-y-1`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-[9px] font-black font-mono px-1.5 py-0.5 bg-black text-white dark:bg-white dark:text-black rounded">
-                      {item.badge}
-                    </span>
-                  </div>
-                  <h3 className="text-xs font-black mb-1">{item.title}</h3>
-                  <p className="text-[11px] leading-tight font-medium opacity-90">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 기술 스택 스티커 모음 */}
-          <div className="mt-7">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 bg-black dark:bg-white inline-block" />
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                TECH STACK // 사용 기술
-              </h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {techStacks.map((tech) => (
-                <span
-                  key={tech.name}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] cursor-default ${tech.bg}`}
-                >
-                  #{tech.name}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 소셜 및 링크 섹션 */}
-          <div className="mt-7">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 bg-black dark:bg-white inline-block" />
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                CONNECT // 링크 & 소셜
-              </h2>
-            </div>
-            <div className="space-y-2.5">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-zinc-800 border-3 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] dark:hover:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-[#FFE600] text-black border-2 border-black flex items-center justify-center font-bold shadow-[2px_2px_0px_0px_#000] group-hover:rotate-6 transition-transform">
-                      {link.icon}
-                    </div>
-                    <div className="text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs sm:text-sm font-black text-black dark:text-white">
-                          {link.name}
-                        </span>
-                        <span className={`text-[9px] font-black px-1.5 py-0.2 rounded border border-black ${link.tagColor}`}>
-                          {link.tag}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-slate-600 dark:text-zinc-400 font-medium">
-                        {link.desc}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-7 h-7 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-black text-xs group-hover:translate-x-1 transition-transform">
-                    →
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* 메인 액션 버튼 듀오 */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            {/* 프로필 링크 복사 버튼 */}
+            {/* Circular Action Buttons */}
             <button
               type="button"
               onClick={handleCopyLink}
-              className="flex-1 py-3.5 px-5 rounded-xl font-black text-xs sm:text-sm text-black bg-[#FFE600] hover:bg-[#FACC15] border-3 border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+              title="Copy Profile Link"
+              className="w-10 h-10 rounded-full bg-[#f5f5f5] hover:bg-[#e5e5e5] active:scale-95 text-[#111111] flex items-center justify-center transition"
             >
-              {copied ? (
-                <>
-                  <span className="text-base">✓</span>
-                  <span>링크 복사 완료!</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-base">📋</span>
-                  <span>프로필 링크 복사하기</span>
-                </>
-              )}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
             </button>
 
-            {/* 문의 메일 버튼 */}
             <a
               href="mailto:contact@example.com"
-              className="py-3.5 px-6 rounded-xl font-black text-xs sm:text-sm text-black bg-[#67E8F9] hover:bg-[#22D3EE] border-3 border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2"
+              className="h-10 px-5 rounded-full bg-[#111111] text-[#ffffff] text-xs font-semibold flex items-center justify-center active:scale-95 transition"
             >
-              <span className="text-base">✉️</span>
-              <span>이메일 문의하기</span>
+              Contact
             </a>
           </div>
+        </div>
+      </header>
 
-          {/* 푸터 카피라이트 */}
-          <div className="mt-8 pt-4 border-t-2 border-black/15 dark:border-white/15 text-center text-xs font-bold font-mono text-slate-500 dark:text-zinc-400">
-            [ NEO-BRUTALISM LINK PROFILE ] © 2026 배찬혁
+      {/* 3. EDITORIAL CAMPAIGN HERO TILE ({component.campaign-tile}) */}
+      <section id="overview" className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pt-6 sm:pt-8">
+        <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] min-h-[360px] sm:min-h-[460px] overflow-hidden bg-[#111111] rounded-none">
+          {/* Campaign Photography */}
+          <Image
+            src="/dev-banner.jpg"
+            alt="Editorial Campaign Hero"
+            fill
+            priority
+            className="object-cover object-center opacity-85"
+          />
+          
+          {/* Subtle Dark Gradient Overlay for Typography Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
+
+          {/* Campaign Typography Burned Into Photography */}
+          <div className="absolute bottom-6 sm:bottom-12 left-6 sm:left-12 right-6 sm:right-12 flex flex-col items-start select-none">
+            
+            {/* Category / Collection Tag */}
+            <span className="text-xs sm:text-sm font-semibold tracking-widest text-[#cacacb] uppercase mb-2">
+              Spring 2026 // Developer Collection
+            </span>
+
+            {/* Display Campaign Headline (96px scale, 0.9 line-height) */}
+            <h1 className="font-campaign text-white text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9] tracking-tight mb-4">
+              MAKE YOUR MARK.
+            </h1>
+
+            {/* Secondary Subtitle */}
+            <p className="text-white/90 text-sm sm:text-base md:text-lg font-normal max-w-xl mb-6">
+              Full-stack engineering & AI vibe coding built with mathematical precision, zero decorative chrome, and relentless execution.
+            </p>
+
+            {/* Bottom-left Pill Actions */}
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="#works"
+                className="h-12 px-8 rounded-full bg-[#ffffff] text-[#111111] text-sm font-semibold flex items-center justify-center hover:bg-[#f5f5f5] active:scale-95 transition"
+              >
+                Explore Works
+              </a>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="h-12 px-8 rounded-full bg-transparent border border-white text-white text-sm font-semibold flex items-center justify-center hover:bg-white/10 active:scale-95 transition"
+              >
+                {copied ? "Link Copied ✓" : "Share Profile"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 네오브루탈리즘 토스트 알림 */}
+      {/* 4. EDITORIAL PROFILE CARD & BIOGRAPHY ({spacing.section} = 48px rhythm) */}
+      <section className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column: 1:1 Square Product Portrait on {colors.soft-cloud} */}
+          <div className="lg:col-span-5 w-full">
+            <div className="relative aspect-square w-full max-w-md mx-auto bg-[#f5f5f5] overflow-hidden rounded-none">
+              <Image
+                src="/profile-avatar.jpg"
+                alt="배찬혁 아바타 포트레이트"
+                fill
+                priority
+                className="object-cover object-center"
+              />
+              {/* Promo Badge anchored top-left */}
+              <div className="absolute top-4 left-4">
+                <span className="px-3 py-1 rounded-full bg-[#ffffff] text-[#111111] text-xs font-semibold border border-[#cacacb] shadow-none">
+                  Core Engineer
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Mechanical Restraint Editorial Text */}
+          <div className="lg:col-span-7 flex flex-col items-start">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-bold tracking-widest text-[#707072] uppercase">
+                ATHLETIC EDITORIAL // PROFILE
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#007d48]" />
+              <span className="text-xs font-semibold text-[#007d48]">Available for Collaboration</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#111111] leading-tight mb-4">
+              BAE CHAN-HYEOK
+            </h2>
+
+            <div className="text-sm font-medium text-[#707072] uppercase tracking-wider mb-6">
+              Police Administration · Software Engineering · Vibe Coding
+            </div>
+
+            {/* Editorial Bio Block */}
+            <div className="border-t border-[#cacacb] pt-6 mb-8 w-full">
+              <p className="text-base sm:text-lg text-[#39393b] leading-relaxed mb-4">
+                새로운 기술을 탐구하고 문제를 해결하며, 사용자에게 가치를 전달하는 개발자 배찬혁입니다.
+                경찰행정학의 원칙과 분석적 사고를 바탕으로, 타협 없는 사용자 중심의 웹 애플리케이션을 구축합니다.
+              </p>
+              <p className="text-sm sm:text-base text-[#707072] leading-relaxed">
+                디자인 시스템의 절제와 엔지니어링의 정밀함으로 복잡함을 걷어내고, 제품의 본질과 직관적인 속도를 극대화합니다.
+              </p>
+            </div>
+
+            {/* Spec Row: Quick Specs */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 py-4 border-y border-[#cacacb] w-full mb-8">
+              <div>
+                <div className="text-xs text-[#707072] font-medium uppercase mb-1">Discipline</div>
+                <div className="text-sm font-semibold text-[#111111]">Full-Stack Web</div>
+              </div>
+              <div>
+                <div className="text-xs text-[#707072] font-medium uppercase mb-1">Framework</div>
+                <div className="text-sm font-semibold text-[#111111]">Next.js / React 19</div>
+              </div>
+              <div>
+                <div className="text-xs text-[#707072] font-medium uppercase mb-1">Location</div>
+                <div className="text-sm font-semibold text-[#111111]">Seoul, Republic of Korea</div>
+              </div>
+            </div>
+
+            {/* Primary & Secondary Pill CTA Pair */}
+            <div className="flex flex-wrap items-center gap-4">
+              <a
+                href="mailto:contact@example.com"
+                className="h-12 px-8 rounded-full bg-[#111111] text-[#ffffff] text-sm font-semibold flex items-center justify-center hover:bg-[#39393b] active:scale-95 transition"
+              >
+                Inquire Project
+              </a>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="h-12 px-8 rounded-full bg-[#f5f5f5] text-[#111111] text-sm font-semibold flex items-center justify-center hover:bg-[#e5e5e5] active:scale-95 transition"
+              >
+                {copied ? "Link Copied ✓" : "Copy Profile Link"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. FILTER CHIPS & CATALOG LISTING ({spacing.section} = 48px rhythm) */}
+      <section id="works" className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12 border-t border-[#cacacb]">
+        
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <span className="text-xs font-bold text-[#707072] tracking-widest uppercase block mb-1">
+              PORTFOLIO CATALOG
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111111]">
+              FEATURED WORKS & EXPERIMENTS
+            </h2>
+          </div>
+
+          {/* Filter Chips Bar ({component.filter-chip}) */}
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { id: "all", label: "All Works" },
+              { id: "web", label: "Web Applications" },
+              { id: "ai", label: "AI & Vibe Tools" },
+              { id: "admin", label: "Civic & Safety" },
+            ].map((chip) => {
+              const isActive = activeFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setActiveFilter(chip.id)}
+                  className={`h-10 px-5 rounded-full text-xs font-semibold transition active:scale-95 ${
+                    isActive
+                      ? "bg-[#111111] text-[#ffffff]"
+                      : "bg-[#ffffff] text-[#111111] border border-[#cacacb] hover:border-[#111111]"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Product Grid (3-up desktop, 2-up tablet, 1-up mobile per spec) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {filteredProjects.map((project) => (
+            <article
+              key={project.id}
+              className="bg-[#ffffff] rounded-none p-0 flex flex-col group"
+            >
+              {/* Product Photo on {colors.soft-cloud} */}
+              <div className="relative aspect-square w-full bg-[#f5f5f5] overflow-hidden rounded-none mb-3">
+                <Image
+                  src="/dev-banner.jpg"
+                  alt={project.name}
+                  fill
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                />
+                
+                {/* Promo Badge (top-left) */}
+                {project.badge && (
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full bg-[#ffffff] text-[#111111] text-[11px] font-semibold border border-[#cacacb]">
+                      {project.badge}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Swatch Dot Row (12px circular colorways per spec) */}
+              <div className="flex items-center gap-1.5 mb-2">
+                {project.swatches.map((color, idx) => (
+                  <span
+                    key={idx}
+                    style={{ backgroundColor: color }}
+                    className="w-3 h-3 rounded-full border border-[#cacacb] inline-block"
+                  />
+                ))}
+                <span className="text-[11px] text-[#707072] ml-1 font-medium">
+                  {project.techs}
+                </span>
+              </div>
+
+              {/* Product Name */}
+              <h3 className="text-base font-semibold text-[#111111] tracking-tight group-hover:underline">
+                <a href={project.link} target="_blank" rel="noreferrer">
+                  {project.name}
+                </a>
+              </h3>
+
+              {/* Category Subtitle */}
+              <div className="text-sm font-medium text-[#707072] mt-0.5 mb-2">
+                {project.category}
+              </div>
+
+              {/* Description */}
+              <p className="text-xs text-[#39393b] leading-relaxed mb-3">
+                {project.tagline}
+              </p>
+
+              {/* Price / Status Row */}
+              <div className="flex items-center gap-2 text-sm font-medium mt-auto pt-2">
+                {project.isSale ? (
+                  <>
+                    <span className="text-[#d30005] font-semibold">{project.statusText}</span>
+                    {project.originalStatus && (
+                      <span className="text-[#707072] line-through text-xs">
+                        {project.originalStatus}
+                      </span>
+                    )}
+                    {project.discountText && (
+                      <span className="text-[#d30005] text-xs font-semibold">
+                        ({project.discountText})
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[#111111] font-semibold">{project.statusText}</span>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* 6. TECHNICAL STACK CATALOG STRIP ({spacing.section} = 48px rhythm) */}
+      <section id="stack" className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12 border-t border-[#cacacb]">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <span className="text-xs font-bold text-[#707072] tracking-widest uppercase block mb-1">
+              SPECIFICATIONS
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111111]">
+              TECHNICAL STACK & CAPABILITIES
+            </h2>
+          </div>
+        </div>
+
+        {/* 4-up Technology Tile Rail */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          {[
+            {
+              category: "Core Engine",
+              name: "Next.js 16 & React 19",
+              detail: "App Router · Turbopack · RSC",
+            },
+            {
+              category: "Type Safety",
+              name: "TypeScript 5+",
+              detail: "Strict Typing · Robust Schemas",
+            },
+            {
+              category: "Design System",
+              name: "Tailwind CSS v4",
+              detail: "Token Hierarchy · Zero Chrome Bloat",
+            },
+            {
+              category: "Cloud & Backend",
+              name: "Firebase & Edge APIs",
+              detail: "Firestore · Auth · Serverless",
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="p-6 bg-[#f5f5f5] rounded-none flex flex-col justify-between min-h-[140px] hover:bg-[#e5e5e5] transition"
+            >
+              <span className="text-xs font-bold text-[#707072] uppercase tracking-wider">
+                {item.category}
+              </span>
+              <div>
+                <h4 className="text-base font-bold text-[#111111] mb-1">
+                  {item.name}
+                </h4>
+                <p className="text-xs text-[#39393b]">{item.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. PDP DISCLOSURE ACCORDIONS ({component.pdp-disclosure-row}) */}
+      <section id="philosophy" className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12 border-t border-[#cacacb]">
+        <div className="max-w-3xl">
+          <span className="text-xs font-bold text-[#707072] tracking-widest uppercase block mb-2">
+            DETAILED SPECIFICATIONS & ACCORDION
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111111] mb-8">
+            PRODUCT & ARCHITECTURAL DISCLOSURE
+          </h2>
+
+          <div className="w-full">
+            {disclosures.map((item, index) => {
+              const isOpen = activeDisclosure === index;
+              return (
+                <div key={index} className="border-b border-[#cacacb]">
+                  <button
+                    type="button"
+                    onClick={() => toggleDisclosure(index)}
+                    className="w-full py-6 flex items-center justify-between text-left group"
+                  >
+                    <span className="text-base sm:text-lg font-medium text-[#111111] group-hover:text-[#707072] transition">
+                      {item.title}
+                    </span>
+                    <span className="text-xl font-light text-[#111111] transform transition-transform duration-200">
+                      {isOpen ? "−" : "+"}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="pb-6 text-sm sm:text-base text-[#39393b] leading-relaxed">
+                      {item.content}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. FOOTER ({component.footer}) */}
+      <footer className="mt-auto w-full border-t border-[#cacacb] bg-[#ffffff] pt-12 pb-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12">
+          
+          {/* 4-column classic Nike catalog layout */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">
+                Resources
+              </h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#707072]">
+                <li><a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#111111]">GitHub Repository</a></li>
+                <li><a href="https://velog.io" target="_blank" rel="noreferrer" className="hover:text-[#111111]">Engineering Blog</a></li>
+                <li><a href="#works" className="hover:text-[#111111]">Project Documentation</a></li>
+                <li><a href="#stack" className="hover:text-[#111111]">Design Tokens</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">
+                Developer
+              </h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#707072]">
+                <li><span className="text-[#111111]">Bae Chan-hyeok</span></li>
+                <li><span>Police Administration Major</span></li>
+                <li><span>Full-Stack Web Engineering</span></li>
+                <li><span>Vibe Coding & AI Workflows</span></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">
+                Catalog
+              </h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#707072]">
+                <li><a href="#works" className="hover:text-[#111111]">MyLink Bio Portal</a></li>
+                <li><a href="#works" className="hover:text-[#111111]">Vibe Engine AI</a></li>
+                <li><a href="#works" className="hover:text-[#111111]">Civic Safety Analytics</a></li>
+                <li><a href="#works" className="hover:text-[#111111]">Open Source Packages</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">
+                Connect
+              </h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#707072]">
+                <li><a href="mailto:contact@example.com" className="hover:text-[#111111]">contact@example.com</a></li>
+                <li><a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#111111]">GitHub Profile</a></li>
+                <li><a href="https://velog.io" target="_blank" rel="noreferrer" className="hover:text-[#111111]">Velog Tech Log</a></li>
+                <li><button type="button" onClick={handleCopyLink} className="hover:text-[#111111] text-left">Copy Profile Link</button></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Legal Fine-Print Row ({typography.utility-xs} ~9px-11px) */}
+          <div className="border-t border-[#cacacb] pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#707072] gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-[#111111] font-semibold">South Korea</span>
+              <span>© 2026 Bae Chan-hyeok. All Rights Reserved.</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <span className="hover:text-[#111111] cursor-pointer">Engineering Standards</span>
+              <span className="hover:text-[#111111] cursor-pointer">Terms of Use</span>
+              <span className="hover:text-[#111111] cursor-pointer">Privacy Policy</span>
+              <span className="hover:text-[#111111] cursor-pointer">Nike Design Grammar</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Nike Black Pill Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl bg-[#00F0FF] text-black font-black text-xs sm:text-sm border-3 border-black shadow-[5px_5px_0px_0px_#000] transition-all animate-bounce flex items-center gap-2 z-50">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-[#111111] text-[#ffffff] text-xs font-semibold shadow-none border border-[#e5e5e5] transition-all flex items-center gap-2 z-50">
+          <span className="w-2 h-2 rounded-full bg-[#007d48]" />
           <span>{toastMessage}</span>
         </div>
       )}
-    </main>
+    </div>
   );
 }
